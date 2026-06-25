@@ -143,18 +143,22 @@ function Index() {
                 Координаты для навигатора: 56.780662, 43.360892
               </p>
             </div>
-            <div className="mt-10 border border-deep/30 p-2 bg-cream shadow-lg">
+            <a
+              href="https://yandex.com/maps/-/CTQwjQ3q"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-10 block border border-deep/30 p-2 bg-cream shadow-lg"
+            >
               <iframe
                 title="Карта — База отдыха Акватория"
                 src="https://yandex.ru/map-widget/v1/?ll=43.360892%2C56.780662&z=15&pt=43.360892,56.780662,pm2rdm&l=map"
-                className="w-full h-[420px] block border-0"
+                className="w-full h-[420px] block border-0 pointer-events-none"
                 loading="lazy"
-                allowFullScreen
               />
-            </div>
+            </a>
             <div className="mt-6 text-center">
               <a
-                href="https://yandex.ru/maps/?pt=43.360892,56.780662&z=15&l=map"
+                href="https://yandex.com/maps/-/CTQwjQ3q"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-block font-sans text-[11px] tracking-[0.3em] uppercase text-cream bg-deep hover:bg-caramel transition px-6 py-3"
