@@ -22,8 +22,8 @@ export const Route = createFileRoute("/")({
 const schedule = [
   { time: "17:30", title: "Сбор гостей и фуршет", note: "Welcome-зона, игристое, лёгкие закуски" },
   { time: "18:00", title: "Банкет открывается", note: "Салаты, закуски и интерактив от ведущего" },
-  { time: "19:00", title: "Горячие закуски", note: "" },
-  { time: "20:00", title: "Горячее", note: "" },
+  { time: "19:00", title: "Горячие закуски", note: "и поздравления" },
+  { time: "20:00", title: "Горячее", note: "и жаркие танцы" },
   { time: "21:00", title: "Десерт", note: "" },
   { time: "21:30", title: "Вечеринка", note: "Танцы до рассвета" },
 ];
@@ -82,7 +82,7 @@ function Index() {
               <p className="mt-2 font-sans tracking-[0.35em] text-xs uppercase text-cream/80">База отдыха «Акватория»</p>
             </div>
             <div className="hidden sm:block w-32 shrink-0">
-              <Polaroid src={tropics.url} alt="Настя и Иван" rotate="rotate-6" />
+              <Polaroid src={baikal.url} alt="Настя и Иван" rotate="rotate-6" />
             </div>
           </section>
 
@@ -127,7 +127,7 @@ function Index() {
           {/* Photo strip */}
           <section className="mt-24 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
             <img src={hero.url} alt="" className="w-full h-64 sm:h-80 object-cover" />
-            <img src={tropics.url} alt="" className="w-full h-64 sm:h-80 object-cover" />
+            <img src={baikal.url} alt="" className="w-full h-64 sm:h-80 object-cover" />
             <img src={ring.url} alt="" className="w-full h-64 sm:h-80 object-cover col-span-2 sm:col-span-1" />
           </section>
 
@@ -143,14 +143,21 @@ function Index() {
                 Координаты для навигатора: 56.780662, 43.360892
               </p>
             </div>
-            <div className="mt-10 border border-deep/30 p-2 bg-cream shadow-lg">
-              <iframe
-                title="Карта — База отдыха Акватория"
-                src="https://yandex.ru/map-widget/v1/?ll=43.360892%2C56.780662&z=14&pt=43.360892,56.780662,pm2rdm"
-                className="w-full h-[420px] block"
+            <a
+              href="https://yandex.ru/maps/?ll=43.360892%2C56.780662&z=15&pt=43.360892,56.780662,pm2rdm"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-10 block border border-deep/30 p-2 bg-cream shadow-lg group"
+              aria-label="Открыть карту в Яндекс Картах"
+            >
+              <img
+                src="https://static-maps.yandex.ru/1.x/?ll=43.360892,56.780662&z=14&l=map&size=600,400&pt=43.360892,56.780662,pm2rdm"
+                srcSet="https://static-maps.yandex.ru/1.x/?ll=43.360892,56.780662&z=14&l=map&size=600,400&scale=2&pt=43.360892,56.780662,pm2rdm 2x"
+                alt="Карта — База отдыха Акватория"
+                className="w-full h-[420px] object-cover block transition group-hover:opacity-90"
                 loading="lazy"
               />
-            </div>
+            </a>
             <div className="mt-6 text-center">
               <a
                 href="https://yandex.ru/maps/?pt=43.360892,56.780662&z=15&l=map"
