@@ -4,6 +4,7 @@ import ring from "@/assets/ring.jpg.asset.json";
 import sunset from "@/assets/sunset.jpg.asset.json";
 import tropics from "@/assets/tropics.jpg.asset.json";
 import boat from "@/assets/boat.jpg.asset.json";
+import baikal from "@/assets/baikal.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,7 +24,7 @@ const schedule = [
   { time: "18:00", title: "Банкет открывается", note: "Салаты, закуски и интерактив от ведущего" },
   { time: "19:00", title: "Горячие закуски", note: "" },
   { time: "20:00", title: "Горячее", note: "" },
-  { time: "21:00", title: "Десерт и свадебный торт", note: "" },
+  { time: "21:00", title: "Десерт", note: "" },
   { time: "21:30", title: "Вечеринка", note: "Танцы до рассвета" },
 ];
 
