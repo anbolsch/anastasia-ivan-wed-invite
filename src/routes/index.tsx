@@ -6,6 +6,10 @@ import sunset from "@/assets/sunset.jpg.asset.json";
 import boat from "@/assets/boat.jpg.asset.json";
 import baikal from "@/assets/baikal.jpg.asset.json";
 import scooter from "@/assets/scooter.jpg.asset.json";
+import hotelBeach from "@/assets/hotel-beach.webp.asset.json";
+import hotelTent from "@/assets/hotel-tent.jpg.asset.json";
+import hotelPier from "@/assets/hotel-pier.webp.asset.json";
+import hotelCabin from "@/assets/hotel-cabin.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -223,6 +227,18 @@ function Index() {
               <p className="mt-1 font-sans text-sm text-ink/60">
                 Координаты для навигатора: 56.780662, 43.360892
               </p>
+            </div>
+            <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {[
+                { src: hotelTent.url, alt: "Шатёр на берегу" },
+                { src: hotelBeach.url, alt: "Пляж на закате" },
+                { src: hotelPier.url, alt: "Беседка у воды" },
+                { src: hotelCabin.url, alt: "Домик в лесу" },
+              ].map((p) => (
+                <div key={p.src} className="bg-cream p-2 shadow-md">
+                  <img src={p.src} alt={p.alt} className="block w-full aspect-[4/5] object-cover" loading="lazy" />
+                </div>
+              ))}
             </div>
             <div className="relative mt-10 border border-deep/30 p-2 bg-cream shadow-lg">
               <iframe
