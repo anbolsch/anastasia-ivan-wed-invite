@@ -76,7 +76,6 @@ function Index() {
         <div className="border border-deep/40 px-4 sm:px-8 lg:px-14 py-8 sm:py-12">
           {/* Nav */}
           <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-deep">
-            <a href="#story" className="font-sans text-[11px] tracking-[0.25em] uppercase hover:text-caramel transition">Наша история</a>
             <a href="#schedule" className="font-sans text-[11px] tracking-[0.25em] uppercase hover:text-caramel transition">Расписание</a>
             <span className="px-2"><Monogram /></span>
             <a href="#place" className="font-sans text-[11px] tracking-[0.25em] uppercase hover:text-caramel transition">Место</a>
