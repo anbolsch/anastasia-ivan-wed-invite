@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import hero from "@/assets/hero.jpg.asset.json";
 import ring from "@/assets/ring.jpg.asset.json";
 import sunset from "@/assets/sunset.jpg.asset.json";
-import tropics from "@/assets/tropics.jpg.asset.json";
 import boat from "@/assets/boat.jpg.asset.json";
 import baikal from "@/assets/baikal.jpg.asset.json";
 import scooter from "@/assets/scooter.jpg.asset.json";
