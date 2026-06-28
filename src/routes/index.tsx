@@ -389,6 +389,36 @@ function Index() {
           </footer>
         </div>
       </div>
+      {previewOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/70">
+          <div className="flex items-center justify-between gap-3 bg-deep text-cream px-4 py-3">
+            <span className="font-sans text-[11px] tracking-[0.3em] uppercase">Предпросмотр PDF</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSavePdf}
+                disabled={saving}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase bg-caramel hover:bg-caramel/80 transition px-4 py-2 disabled:opacity-60"
+              >
+                {saving ? "Сохранение…" : "Скачать PDF"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(false)}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase border border-cream/50 hover:bg-cream/10 transition px-4 py-2"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+          <iframe
+            ref={iframeRef}
+            title="Предпросмотр приглашения"
+            srcDoc={previewSrcDoc}
+            className="flex-1 w-full bg-[#e9dcc6] border-0"
+          />
+        </div>
+      )}
     </div>
   );
 }
