@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import hero from "@/assets/hero.jpg.asset.json";
 import ring from "@/assets/ring.jpg.asset.json";
 import sunset from "@/assets/sunset.jpg.asset.json";
@@ -121,15 +121,7 @@ function downloadInvitation() {
   URL.revokeObjectURL(url);
 }
 
-async function downloadPdf() {
-  const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
-    import("jspdf"),
-    import("html2canvas"),
-  ]);
-
-  const container = document.createElement("div");
-  container.style.cssText =
-    "position:fixed;left:-10000px;top:0;width:800px;padding:48px;background:#f8f1e7;color:#1a2a44;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.5;";
+function buildInvitationHtml() {
   const scheduleHtml = schedule
     .map(
       (s) =>
@@ -142,8 +134,8 @@ async function downloadPdf() {
         `<div style="padding:12px 0;border-bottom:1px solid rgba(26,42,68,.2);"><div style="font-family:'Allura',cursive;font-size:26px;color:#1a2a44;">${f.q}</div><div style="font-size:14px;margin-top:6px;">${f.a}</div></div>`,
     )
     .join("");
-
-  container.innerHTML = `
+  return `
+  <div id="pdf-root" style="width:800px;padding:48px;background:#f8f1e7;color:#1a2a44;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.5;box-sizing:border-box;">
     <div style="text-align:center;border-bottom:1px solid rgba(26,42,68,.3);padding-bottom:24px;margin-bottom:24px;">
       <div style="font-family:'Allura',cursive;font-size:56px;color:#1a2a44;line-height:1;">Анастасия &amp; Иван</div>
       <div style="font-style:italic;margin-top:10px;">приглашают вас на свою свадьбу</div>
@@ -165,36 +157,60 @@ async function downloadPdf() {
       ${faqHtml}
     </div>
     <div style="text-align:center;margin-top:28px;font-style:italic;color:rgba(26,42,68,.7);">До встречи 21 августа 2026 года</div>
+  </div>
   `;
-  document.body.appendChild(container);
+}
 
-  try {
-    const canvas = await html2canvas(container, { scale: 2, backgroundColor: "#f8f1e7" });
-    const imgData = canvas.toDataURL("image/jpeg", 0.92);
-    const pdf = new jsPDF({ unit: "pt", format: "a4" });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    let heightLeft = imgH;
-    let position = 0;
+const pdfIframeSrcDoc = `<!doctype html><html><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>html,body{margin:0;padding:0;background:#e9dcc6;}body{display:flex;justify-content:center;padding:20px 0;}</style></head><body>__BODY__</body></html>`;
+
+async function generatePdfFromIframe(iframe: HTMLIFrameElement) {
+  const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+    import("jspdf"),
+    import("html2canvas"),
+  ]);
+  const doc = iframe.contentDocument!;
+  const target = doc.getElementById("pdf-root") as HTMLElement;
+  const canvas = await html2canvas(target, { scale: 2, backgroundColor: "#f8f1e7", windowWidth: 800 });
+  const imgData = canvas.toDataURL("image/jpeg", 0.92);
+  const pdf = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const imgW = pageW;
+  const imgH = (canvas.height * imgW) / canvas.width;
+  let heightLeft = imgH;
+  let position = 0;
+  pdf.addImage(imgData, "JPEG", 0, position, imgW, imgH);
+  heightLeft -= pageH;
+  while (heightLeft > 0) {
+    position = heightLeft - imgH;
+    pdf.addPage();
     pdf.addImage(imgData, "JPEG", 0, position, imgW, imgH);
     heightLeft -= pageH;
-    while (heightLeft > 0) {
-      position = heightLeft - imgH;
-      pdf.addPage();
-      pdf.addImage(imgData, "JPEG", 0, position, imgW, imgH);
-      heightLeft -= pageH;
-    }
-    pdf.save("priglashenie-anastasia-ivan.pdf");
-  } finally {
-    document.body.removeChild(container);
   }
+  pdf.save("priglashenie-anastasia-ivan.pdf");
 }
 
 function Index() {
   const [daysLeft, setDaysLeft] = useState(getDaysUntilWedding);
   const dayWord = useMemo(() => getDayWord(daysLeft), [daysLeft]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const previewSrcDoc = useMemo(
+    () => pdfIframeSrcDoc.replace("__BODY__", buildInvitationHtml()),
+    [],
+  );
+
+  const handleSavePdf = async () => {
+    if (!iframeRef.current) return;
+    setSaving(true);
+    try {
+      await generatePdfFromIframe(iframeRef.current);
+      setPreviewOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     const timer = window.setInterval(() => setDaysLeft(getDaysUntilWedding()), 60 * 60 * 1000);
@@ -250,10 +266,10 @@ function Index() {
               </button>
               <button
                 type="button"
-                onClick={downloadPdf}
+                onClick={() => setPreviewOpen(true)}
                 className="font-sans text-[11px] tracking-[0.3em] uppercase text-deep border border-deep hover:bg-deep hover:text-cream transition px-6 py-4"
               >
-                Скачать PDF
+                Предпросмотр PDF
               </button>
             </div>
           </section>
@@ -373,6 +389,36 @@ function Index() {
           </footer>
         </div>
       </div>
+      {previewOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/70">
+          <div className="flex items-center justify-between gap-3 bg-deep text-cream px-4 py-3">
+            <span className="font-sans text-[11px] tracking-[0.3em] uppercase">Предпросмотр PDF</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSavePdf}
+                disabled={saving}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase bg-caramel hover:bg-caramel/80 transition px-4 py-2 disabled:opacity-60"
+              >
+                {saving ? "Сохранение…" : "Скачать PDF"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(false)}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase border border-cream/50 hover:bg-cream/10 transition px-4 py-2"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+          <iframe
+            ref={iframeRef}
+            title="Предпросмотр приглашения"
+            srcDoc={previewSrcDoc}
+            className="flex-1 w-full bg-[#e9dcc6] border-0"
+          />
+        </div>
+      )}
     </div>
   );
 }
