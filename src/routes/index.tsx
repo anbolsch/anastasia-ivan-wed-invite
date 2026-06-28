@@ -248,6 +248,13 @@ function Index() {
               >
                 Скачать приглашение
               </button>
+              <button
+                type="button"
+                onClick={downloadPdf}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase text-deep border border-deep hover:bg-deep hover:text-cream transition px-6 py-4"
+              >
+                Скачать PDF
+              </button>
             </div>
           </section>
 
