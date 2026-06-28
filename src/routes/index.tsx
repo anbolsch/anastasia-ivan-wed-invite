@@ -195,7 +195,7 @@ function Index() {
   const dayWord = useMemo(() => getDayWord(daysLeft), [daysLeft]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const previewSrcDoc = useMemo(
     () => pdfIframeSrcDoc.replace("__BODY__", buildInvitationHtml()),
     [],
