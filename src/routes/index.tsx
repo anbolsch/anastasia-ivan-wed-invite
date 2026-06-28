@@ -266,10 +266,10 @@ function Index() {
               </button>
               <button
                 type="button"
-                onClick={downloadPdf}
+                onClick={() => setPreviewOpen(true)}
                 className="font-sans text-[11px] tracking-[0.3em] uppercase text-deep border border-deep hover:bg-deep hover:text-cream transition px-6 py-4"
               >
-                Скачать PDF
+                Предпросмотр PDF
               </button>
             </div>
           </section>
