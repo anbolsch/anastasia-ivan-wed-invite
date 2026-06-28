@@ -121,6 +121,77 @@ function downloadInvitation() {
   URL.revokeObjectURL(url);
 }
 
+async function downloadPdf() {
+  const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+    import("jspdf"),
+    import("html2canvas"),
+  ]);
+
+  const container = document.createElement("div");
+  container.style.cssText =
+    "position:fixed;left:-10000px;top:0;width:800px;padding:48px;background:#f8f1e7;color:#1a2a44;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.5;";
+  const scheduleHtml = schedule
+    .map(
+      (s) =>
+        `<div style="display:flex;gap:24px;padding:10px 0;border-bottom:1px solid rgba(26,42,68,.2);"><div style="width:90px;color:#b07a4a;font-size:22px;font-family:'Allura',cursive;">${s.time}</div><div><div style="font-size:18px;">${s.title}</div>${s.note ? `<div style="font-size:13px;color:rgba(26,42,68,.7);font-style:italic;">${s.note}</div>` : ""}</div></div>`,
+    )
+    .join("");
+  const faqHtml = faqs
+    .map(
+      (f) =>
+        `<div style="padding:12px 0;border-bottom:1px solid rgba(26,42,68,.2);"><div style="font-family:'Allura',cursive;font-size:26px;color:#1a2a44;">${f.q}</div><div style="font-size:14px;margin-top:6px;">${f.a}</div></div>`,
+    )
+    .join("");
+
+  container.innerHTML = `
+    <div style="text-align:center;border-bottom:1px solid rgba(26,42,68,.3);padding-bottom:24px;margin-bottom:24px;">
+      <div style="font-family:'Allura',cursive;font-size:56px;color:#1a2a44;line-height:1;">Анастасия &amp; Иван</div>
+      <div style="font-style:italic;margin-top:10px;">приглашают вас на свою свадьбу</div>
+      <div style="font-family:'Allura',cursive;font-size:48px;color:#b07a4a;margin-top:8px;">21.08.2026</div>
+      <div style="letter-spacing:.3em;font-size:11px;text-transform:uppercase;margin-top:6px;">База отдыха «Акватория»</div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="text-align:center;letter-spacing:.3em;font-size:11px;text-transform:uppercase;color:#b07a4a;">Место проведения</div>
+      <div style="text-align:center;margin-top:8px;font-size:15px;">Нижегородская область, Городецкий район, п. Турбазы</div>
+      <div style="text-align:center;font-size:13px;color:rgba(26,42,68,.7);">Координаты: 56.780662, 43.360892</div>
+      <div style="text-align:center;font-size:12px;margin-top:4px;">${yandexMapLink}</div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="text-align:center;font-family:'Allura',cursive;font-size:36px;color:#1a2a44;">Расписание</div>
+      ${scheduleHtml}
+    </div>
+    <div>
+      <div style="text-align:center;font-family:'Allura',cursive;font-size:36px;color:#1a2a44;">Вопросы и ответы</div>
+      ${faqHtml}
+    </div>
+    <div style="text-align:center;margin-top:28px;font-style:italic;color:rgba(26,42,68,.7);">До встречи 21 августа 2026 года</div>
+  `;
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, { scale: 2, backgroundColor: "#f8f1e7" });
+    const imgData = canvas.toDataURL("image/jpeg", 0.92);
+    const pdf = new jsPDF({ unit: "pt", format: "a4" });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    let heightLeft = imgH;
+    let position = 0;
+    pdf.addImage(imgData, "JPEG", 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while (heightLeft > 0) {
+      position = heightLeft - imgH;
+      pdf.addPage();
+      pdf.addImage(imgData, "JPEG", 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
+    pdf.save("priglashenie-anastasia-ivan.pdf");
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
 function Index() {
   const [daysLeft, setDaysLeft] = useState(getDaysUntilWedding);
   const dayWord = useMemo(() => getDayWord(daysLeft), [daysLeft]);
@@ -176,6 +247,13 @@ function Index() {
                 className="font-sans text-[11px] tracking-[0.3em] uppercase text-cream bg-deep hover:bg-caramel transition px-6 py-4"
               >
                 Скачать приглашение
+              </button>
+              <button
+                type="button"
+                onClick={downloadPdf}
+                className="font-sans text-[11px] tracking-[0.3em] uppercase text-deep border border-deep hover:bg-deep hover:text-cream transition px-6 py-4"
+              >
+                Скачать PDF
               </button>
             </div>
           </section>
